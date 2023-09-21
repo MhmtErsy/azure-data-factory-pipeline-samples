@@ -19,7 +19,7 @@
 					"value": "@dataset().cw_fileName",
 					"type": "Expression"
 				},
-				"folderPath": "departmant",
+				"folderPath": "department",
 				"fileSystem": "company"
 			},
 			"compressionCodec": "snappy"
