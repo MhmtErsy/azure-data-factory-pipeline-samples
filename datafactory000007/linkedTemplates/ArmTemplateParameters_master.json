@@ -5,14 +5,8 @@
 		"factoryName": {
 			"value": "datafactory000007"
 		},
-		"company_datalake_accountKey": {
-			"value": ""
-		},
 		"pg_mehmet_local_connectionString": {
 			"value": ""
-		},
-		"company_datalake_properties_typeProperties_url": {
-			"value": "https://mydatalake007.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"value": ""
