@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "PostgreSql",
 		"typeProperties": {
-			"connectionString": "host=localhost;port=5432;database=postgres;uid=postgres;encryptionmethod=0",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI0ZjcwOGE0Yi1hY2VlLTQ1NjAtOTg4OC01ZmY3YzdhZjI4MjgiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"connectionString": "host=localhost;port=5432;database=Adventureworks;uid=postgres;encryptionmethod=0",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI1OWY4NmMzMC1mY2Q4LTRjMDQtYjc3Mi00OTUwZmJiMmE0YmQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "mehmet-local-IR",
