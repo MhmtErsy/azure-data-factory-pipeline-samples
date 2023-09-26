@@ -7,9 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactory000007"
 		},
+		"AdventureworksADLS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AdventureworksADLS'"
+		},
 		"pg_mehmet_local_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'pg_mehmet_local'"
+		},
+		"AdventureworksADLS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://mydatalake007.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -38,8 +46,14 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AdventureworksADLS_accountKey": {
+						"value": "[parameters('AdventureworksADLS_accountKey')]"
+					},
 					"pg_mehmet_local_connectionString": {
 						"value": "[parameters('pg_mehmet_local_connectionString')]"
+					},
+					"AdventureworksADLS_properties_typeProperties_url": {
+						"value": "[parameters('AdventureworksADLS_properties_typeProperties_url')]"
 					}
 				}
 			},

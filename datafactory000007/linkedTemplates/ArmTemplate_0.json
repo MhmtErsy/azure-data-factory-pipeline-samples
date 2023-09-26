@@ -7,15 +7,40 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactory000007"
 		},
+		"AdventureworksADLS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AdventureworksADLS'"
+		},
 		"pg_mehmet_local_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'pg_mehmet_local'"
+		},
+		"AdventureworksADLS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://mydatalake007.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AdventureworksADLS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AdventureworksADLS_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AdventureworksADLS_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/mehmet-local-IR')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
@@ -25,6 +50,46 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_GENERIC_PQ_FILE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AdventureworksADLS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"dsDirectoryPath": {
+						"type": "string"
+					},
+					"dsFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().dsFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().dsDirectoryPath",
+							"type": "Expression"
+						},
+						"fileSystem": "adventureworks"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AdventureworksADLS')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pg_mehmet_local')]",
@@ -43,6 +108,169 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/mehmet-local-IR')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_GENERIC_PGSQL_DB_TABLE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "pg_mehmet_local",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"dsTableSchema": {
+						"type": "string"
+					},
+					"dsTableName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "PostgreSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().dsTableSchema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().dsTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/pg_mehmet_local')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Adventureworks_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup Metadata",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "PostgreSqlSource"
+							},
+							"dataset": {
+								"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
+								"type": "DatasetReference",
+								"parameters": {
+									"dsTableSchema": "etl_config",
+									"dsTableName": "extract_metadata"
+								}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "For Each Metadata Record",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup Metadata",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Extract PGSQL to ADLS').output",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Extract PGSQL to ADLS",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "PostgreSqlSource"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
+											"type": "DatasetReference",
+											"parameters": {
+												"dsTableSchema": "etl_config",
+												"dsTableName": "extract_metadata"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DS_GENERIC_PQ_FILE",
+											"type": "DatasetReference",
+											"parameters": {
+												"dsDirectoryPath": {
+													"value": "@item().target_directory_path",
+													"type": "Expression"
+												},
+												"dsFileName": {
+													"value": "@item().target_file_name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_GENERIC_PGSQL_DB_TABLE')]",
+				"[concat(variables('factoryId'), '/datasets/DS_GENERIC_PQ_FILE')]"
 			]
 		}
 	]

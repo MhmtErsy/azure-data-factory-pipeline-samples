@@ -5,8 +5,14 @@
 		"factoryName": {
 			"value": "datafactory000007"
 		},
+		"AdventureworksADLS_accountKey": {
+			"value": ""
+		},
 		"pg_mehmet_local_connectionString": {
 			"value": ""
+		},
+		"AdventureworksADLS_properties_typeProperties_url": {
+			"value": "https://mydatalake007.dfs.core.windows.net/"
 		}
 	}
 }
