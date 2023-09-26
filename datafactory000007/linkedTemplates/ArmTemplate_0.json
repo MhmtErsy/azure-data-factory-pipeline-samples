@@ -175,7 +175,7 @@
 									"dsTableName": "extract_metadata"
 								}
 							},
-							"firstRowOnly": true
+							"firstRowOnly": false
 						}
 					},
 					{
@@ -192,7 +192,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Extract PGSQL to ADLS').output",
+								"value": "@activity('Lookup Metadata').output.value",
 								"type": "Expression"
 							},
 							"activities": [
