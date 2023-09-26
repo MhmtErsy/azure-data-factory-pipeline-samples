@@ -1,0 +1,118 @@
+{
+	"name": "Adventureworks_Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup Metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "PostgreSqlSource"
+					},
+					"dataset": {
+						"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
+						"type": "DatasetReference",
+						"parameters": {
+							"dsTableSchema": "etl_config",
+							"dsTableName": "extract_metadata"
+						}
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "For Each Metadata Record",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Extract PGSQL to ADLS').output",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Extract PGSQL to ADLS",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "PostgreSqlSource"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
+									"type": "DatasetReference",
+									"parameters": {
+										"dsTableSchema": "etl_config",
+										"dsTableName": "extract_metadata"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_GENERIC_PQ_FILE",
+									"type": "DatasetReference",
+									"parameters": {
+										"dsDirectoryPath": {
+											"value": "@item().target_directory_path",
+											"type": "Expression"
+										},
+										"dsFileName": {
+											"value": "@item().target_file_name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}

@@ -1,0 +1,35 @@
+{
+	"name": "DS_GENERIC_PQ_FILE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AdventureworksADLS",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"dsDirectoryPath": {
+				"type": "string"
+			},
+			"dsFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().dsFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().dsDirectoryPath",
+					"type": "Expression"
+				},
+				"fileSystem": "adventureworks"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
