@@ -16,7 +16,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "PostgreSqlSource"
+						"type": "PostgreSqlSource",
+						"query": "select * from etl_config.extract_metadata em where is_active=true"
 					},
 					"dataset": {
 						"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",

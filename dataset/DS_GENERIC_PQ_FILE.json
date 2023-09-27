@@ -28,7 +28,7 @@
 				},
 				"fileSystem": "adventureworks"
 			},
-			"compressionCodec": "snappy"
+			"compressionCodec": "none"
 		},
 		"schema": []
 	}
