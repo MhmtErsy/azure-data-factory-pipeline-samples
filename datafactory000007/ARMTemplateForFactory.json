@@ -44,7 +44,8 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "PostgreSqlSource"
+								"type": "PostgreSqlSource",
+								"query": "select * from etl_config.extract_metadata em where is_active=true"
 							},
 							"dataset": {
 								"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
@@ -115,8 +116,8 @@
 											"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
 											"type": "DatasetReference",
 											"parameters": {
-												"dsTableSchema": "etl_config",
-												"dsTableName": "extract_metadata"
+												"dsTableSchema": "@item().source_table_schema",
+												"dsTableName": "@item().source_table_name"
 											}
 										}
 									],
@@ -142,8 +143,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"annotations": []
 			},
@@ -219,7 +219,7 @@
 						},
 						"fileSystem": "adventureworks"
 					},
-					"compressionCodec": "snappy"
+					"compressionCodec": "none"
 				},
 				"schema": []
 			},
