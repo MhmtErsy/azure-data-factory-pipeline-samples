@@ -88,8 +88,8 @@
 									"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
 									"type": "DatasetReference",
 									"parameters": {
-										"dsTableSchema": "etl_config",
-										"dsTableName": "extract_metadata"
+										"dsTableSchema": "@item().source_table_schema",
+										"dsTableName": "@item().source_table_name"
 									}
 								}
 							],
