@@ -1,0 +1,24 @@
+{
+	"name": "DS_GENERIC_SYNAPSE_TABLE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics_dataworkspace007",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"dsTableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().dsTableName",
+				"type": "Expression"
+			}
+		}
+	}
+}

@@ -1,0 +1,61 @@
+{
+	"name": "Adventureworks_Pipeline_Fact_DM",
+	"properties": {
+		"activities": [
+			{
+				"name": "FactSales",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "PostgreSqlSource",
+						"query": "SELECT dt.ProductID,dt.SalesOrderID,dt.OrderQty,dt.UnitPrice,hd.OrderDate,hd.CustomerID,hd.TaxAmt, current_timestamp as etl_date\n  FROM sales.SalesOrderDetail dt\n  LEFT JOIN sales.SalesOrderHeader hd\n  ON dt.SalesOrderID=hd.SalesOrderID"
+					},
+					"sink": {
+						"type": "SqlDWSink",
+						"preCopyScript": "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'FactSales')\nbegin\n    TRUNCATE table FactSales;\nend",
+						"allowCopyCommand": true,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "AdventureworksADLS",
+							"type": "LinkedServiceReference"
+						},
+						"path": "adventureworks/stg_fact_sales"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_GENERIC_PGSQL_DB_TABLE",
+						"type": "DatasetReference",
+						"parameters": {
+							"dsTableSchema": "-",
+							"dsTableName": "-"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_GENERIC_SYNAPSE_TABLE",
+						"type": "DatasetReference",
+						"parameters": {
+							"dsTableName": "FactSales"
+						}
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
